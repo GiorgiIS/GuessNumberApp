@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button, Image } from 'react-native';
+import { View, Text, StyleSheet, Button, Image, Dimensions } from 'react-native';
 import DefaultStyles from '../constants/default-styles';
 import Colors from '../constants/colors';
 import MainButton from '../components/MainButton';
@@ -16,7 +16,7 @@ const GameOverScreen = props => {
                 }
                 {/* <Image style={styles.image} source={require('../assets/success.png')} resizeMode='cover' /> */}
                 <Image
-                    fadeDuration={1000}
+                    fadeDuration={500}
                     style={styles.image}
                     source={{ uri: 'https://i.redd.it/koa30a2ssdn21.jpg' }} />
             </View>
@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
     },
 
     imageContainer: {
-        width: 300,
-        height: 300,
+        width: Dimensions.get('window').width <= 400 ? 200 :300,
+        height: Dimensions.get('window').width <= 400 ? 200 :300,
         borderRadius: 150,
         borderWidth: 1,
         borderColor: 'black',
