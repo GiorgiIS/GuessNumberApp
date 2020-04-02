@@ -46,6 +46,9 @@ const GameScreen = props => {
     // first parameter is function, that you want to run after componenet is rendered,
     // and second parameter is array of dependencies, variables on what useEffect depeneds
     // so if some of this variables change, useEffect will be called.
+    // useEffect can return function, return function is called clean up function and is used to 
+    // clean resourses created in useEffect, e.x. remove event listener, unsubscribe from something..
+    // its because not to subscribe multiple times on something because of useEffect runs after every render 
     useEffect(() => {
         if (currentGuess === userChoice) {
             onGameOver(currentPasGuesses.length);
@@ -83,49 +86,51 @@ const GameScreen = props => {
     }
 
     return (
-        <View style={styles.screen}>
-            <Text style={DefaultStyles.title}>Opponent's Guess</Text>
-            <NumberContainer>{currentGuess}</NumberContainer>
-            <Card style={styles.buttonContainer}>
+        <ScrollView>
+            <View style={styles.screen}>
+                <Text style={DefaultStyles.title}>Opponent's Guess</Text>
+                <NumberContainer>{currentGuess}</NumberContainer>
+                <Card style={styles.buttonContainer}>
+                    {
+                        // Using bind parameter will pass in function.
+                        // e.x. 'lower' is function parameter that should be passsed
+                    }
+                    <MainButton onPress={nextGuessHandler.bind(this, 'lower')} >
+                        <Ionicons name="md-remove" size={25} color='white' />
+                    </MainButton>
+                    <MainButton onPress={nextGuessHandler.bind(this, 'greater')}>
+                        <Ionicons name="md-add" size={25} color='white' />
+                    </MainButton>
+                </Card>
                 {
-                    // Using bind parameter will pass in function.
-                    // e.x. 'lower' is function parameter that should be passsed
+                    //It is better to wrap ScollView in View component to style without bugs
                 }
-                <MainButton onPress={nextGuessHandler.bind(this, 'lower')} >
-                    <Ionicons name="md-remove" size={25} color='white' />
-                </MainButton>
-                <MainButton onPress={nextGuessHandler.bind(this, 'greater')}>
-                    <Ionicons name="md-add" size={25} color='white' />
-                </MainButton>
-            </Card>
-            {
-                //It is better to wrap ScollView in View component to style without bugs
-            }
-            <View style={styles.listContainer}>
-                {
-                    // contentContainerStyle in ScrollView is used not style, 
-                    // to control content style inside the scrollview,
-                    // same prop should be used on FlatList also.
-                    // but style still can be used for example to control margin of this ScrollView or FlatList
-                }
-                {/* <ScrollView contentContainerStyle={styles.list}>
+                <View style={styles.listContainer}>
+                    {
+                        // contentContainerStyle in ScrollView is used not style, 
+                        // to control content style inside the scrollview,
+                        // same prop should be used on FlatList also.
+                        // but style still can be used for example to control margin of this ScrollView or FlatList
+                    }
+                    {/* <ScrollView contentContainerStyle={styles.list}>
                     {currentPasGuesses.map((guess, index) => renderListItem(guess, index + 1))}
                 </ScrollView> */}
 
-                {/* ScrolView renders all elements of array but FlatList renders only that are visible
+                    {/* ScrolView renders all elements of array but FlatList renders only that are visible
                 to user, thats why for performance in large lists FLatList is better than ScrollView*/}
-                
-                <FlatList
-                    contentContainerStyle={styles.list}
-                    keyExtractor={(item) => item.toString()}
-                    data={currentPasGuesses}
-                    renderItem={renderListItem.bind(this, currentPasGuesses.length)} /> 
+
+                    <FlatList
+                        contentContainerStyle={styles.list}
+                        keyExtractor={(item) => item.toString()}
+                        data={currentPasGuesses}
+                        renderItem={renderListItem.bind(this, currentPasGuesses.length)} />
                     { /* renderListItem has second parameter also, it is passed by default from FlatList
                     as last parameter of function. And this parameter is wrapper of array element that
                     has two fields, index and item. index is the index of the element in array, and item
                     is element itself */}
+                </View>
             </View>
-        </View>
+        </ScrollView>
     );
 }
 
@@ -149,7 +154,7 @@ const styles = StyleSheet.create({
         // not to overlap parent container. Simply use flexGrow if want
         // flex logic and you are in scrollview
         flexGrow: 1,
-        
+
     },
 
     listItem: {
