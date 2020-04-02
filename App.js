@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo';
 
@@ -58,10 +58,16 @@ export default function App() {
   }
 
   return (
-    <View style={styles.screen}>
+    // 1. SafeAreaView is same as view with additional function: it takes visible
+    //    part of the screen and wraps in view, e.x. View component would put content
+    //    on iphone front upper camera, but SafeAreaView knows that this part of screen
+    //    can not be used.
+    // 2. SafeAreaView must be used on the most top of the componenet, in other word
+    //    it can not be nested in other component
+    <SafeAreaView style={styles.screen}>
       <Header title='Guess a number' />
       {content}
-    </View>
+    </SafeAreaView>
   );
 }
 
