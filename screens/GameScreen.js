@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Alert, ScrollView, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Button, Alert, ScrollView, FlatList, Dimensions } from 'react-native';
 import NumberContainer from '../components/NumberContainer';
 import Card from '../components/Card';
 import MainButton from '../components/MainButton';
@@ -34,6 +34,9 @@ const GameScreen = props => {
     // 2. useState(initialGuess) will be used only once, first time the component renders.
     const [currentGuess, setCurrentGuess] = useState(initialGuess);
     const [currentPasGuesses, setCurrentPasGuesses] = useState([initialGuess]);
+    // saving device with in state, and will update when it changes. e.x. when screen rotates.
+    const [availableDeviceHeight, setAvailableDeviceHeight] = useState(Dimensions.get('window').height);
+    const [availableDeviceWidth, setAvailableDeviceWidth] = useState(Dimensions.get('window').width);
 
     // Ref hook, can be used to store data, difference between Ref and State is
     // that when State is changed rerender happens, but when Ref does - nothing.
@@ -41,6 +44,8 @@ const GameScreen = props => {
     const currentMax = useRef(100);
 
     const { userChoice, onGameOver } = props;
+
+
 
     // Effect hook, this is the function that will run after component render,
     // first parameter is function, that you want to run after componenet is rendered,
@@ -52,8 +57,20 @@ const GameScreen = props => {
     useEffect(() => {
         if (currentGuess === userChoice) {
             onGameOver(currentPasGuesses.length);
-        }
+        };
     }, [currentGuess, userChoice, onGameOver]);
+
+    useEffect(() => {
+        const updateLayout = () => {
+            setAvailableDeviceHeight(Dimensions.get('window').height);
+            setAvailableDeviceWidth(Dimensions.get('window').width);
+        };
+
+        Dimensions.addEventListener('change', updateLayout);
+        return () => {
+            Dimensions.removeEventListener('change', updateLayout);
+        }
+    });
 
     const nextGuessHandler = direction => {
         if ((direction === 'lower' && currentGuess < props.userChoice) ||
@@ -83,6 +100,35 @@ const GameScreen = props => {
         //    But currently used syntax will guarantee that you have latest state.
         // 2. I use here nextNumber and not currentGuess from state, because the state is not updated yet.
         setCurrentPasGuesses(currentPasGuesses => [...currentPasGuesses, nextNumber]);
+    }
+
+    const height = availableDeviceHeight;
+
+    // below is commented version of almost same code
+    if (height < 500) {
+        return (
+            <ScrollView>
+                <View style={styles.screen}>
+                    <Text style={DefaultStyles.title}>Opponent's Guess</Text>
+                    <View style={styles.controls}>
+                        <MainButton onPress={nextGuessHandler.bind(this, 'lower')} >
+                            <Ionicons name="md-remove" size={25} color='white' />
+                        </MainButton>
+                        <NumberContainer>{currentGuess}</NumberContainer>
+                        <MainButton onPress={nextGuessHandler.bind(this, 'greater')}>
+                            <Ionicons name="md-add" size={25} color='white' />
+                        </MainButton>
+                    </View>
+                    <View style={styles.listContainer}>
+                        <FlatList
+                            contentContainerStyle={styles.list}
+                            keyExtractor={(item) => item.toString()}
+                            data={currentPasGuesses}
+                            renderItem={renderListItem.bind(this, currentPasGuesses.length)} />
+                    </View>
+                </View>
+            </ScrollView>
+        );
     }
 
     return (
@@ -154,7 +200,6 @@ const styles = StyleSheet.create({
         // not to overlap parent container. Simply use flexGrow if want
         // flex logic and you are in scrollview
         flexGrow: 1,
-
     },
 
     listItem: {
@@ -171,6 +216,12 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '60%'
     },
+    controls: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        width: '60%'
+    }
 });
 
 export default GameScreen;
