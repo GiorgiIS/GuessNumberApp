@@ -6,7 +6,8 @@ import {
     Button,
     TouchableWithoutFeedback,
     Keyboard,
-    Alert
+    Alert,
+    Dimensions
 
 } from 'react-native';
 
@@ -68,11 +69,11 @@ const StartGameScreen = props => {
     }
 
     return (
-        
+
         // Entire view is wrapped in TouchableWithoutFeedback component,
         // that has one job, to determine touch but dont give any visual feedback
         // we use it just to dismiss keyboard 
-        
+
         <TouchableWithoutFeedback onPress={() => {
             Keyboard.dismiss();
         }}>
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
     },
 
     summaryContainer: {
-        marginTop: 20,
+        marginTop: Dimensions.get('window').width < 400 ? 10 : 20,
         alignItems: 'center'
     }
 });
